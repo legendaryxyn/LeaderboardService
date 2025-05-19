@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using LeaderboardService.Controllers;
 using LeaderboardService.Models;
 using LeaderboardService.Services;
@@ -48,11 +49,11 @@ namespace LeaderboardService.Tests
         }
 
         [Fact]
-        public void GetLeaderboard_NoParameters_ReturnsAllCustomers()
+        public async Task GetLeaderboard_NoParameters_ReturnsAllCustomers()
         {
             // Arrange
-            _leaderboardManager.UpdateScore(1, 100);
-            _leaderboardManager.UpdateScore(2, 200);
+            await _leaderboardManager.UpdateScore(1, 100);
+            await _leaderboardManager.UpdateScore(2, 200);
 
             // Act
             var result = _controller.GetLeaderboard(null, null);
@@ -66,12 +67,12 @@ namespace LeaderboardService.Tests
         }
 
         [Fact]
-        public void GetLeaderboard_WithRange_ReturnsCorrectRange()
+        public async Task GetLeaderboard_WithRange_ReturnsCorrectRange()
         {
             // Arrange
-            _leaderboardManager.UpdateScore(1, 100);
-            _leaderboardManager.UpdateScore(2, 200);
-            _leaderboardManager.UpdateScore(3, 150);
+            await _leaderboardManager.UpdateScore(1, 100);
+            await _leaderboardManager.UpdateScore(2, 200);
+            await _leaderboardManager.UpdateScore(3, 150);
 
             // Act
             var result = _controller.GetLeaderboard(2, 3);
@@ -85,10 +86,10 @@ namespace LeaderboardService.Tests
         }
 
         [Fact]
-        public void GetLeaderboard_EmptyLeaderboard_ReturnsEmptyList()
+        public async Task GetLeaderboard_EmptyLeaderboard_ReturnsEmptyList()
         {
             // Act
-            var result = _controller.GetLeaderboard(null, null);
+            var result = await _controller.GetLeaderboard(null, null);
 
             // Assert
             var okResult = Assert.IsType<OkObjectResult>(result.Result);
@@ -97,12 +98,12 @@ namespace LeaderboardService.Tests
         }
 
         [Fact]
-        public void GetCustomerWithNeighbors_ExistingCustomer_ReturnsCorrectNeighbors()
+        public async Task GetCustomerWithNeighbors_ExistingCustomer_ReturnsCorrectNeighbors()
         {
             // Arrange
-            _leaderboardManager.UpdateScore(1, 100);
-            _leaderboardManager.UpdateScore(2, 200);
-            _leaderboardManager.UpdateScore(3, 150);
+            await _leaderboardManager.UpdateScore(1, 100);
+            await _leaderboardManager.UpdateScore(2, 200);
+            await _leaderboardManager.UpdateScore(3, 150);
 
             // Act
             var result = _controller.GetCustomerWithNeighbors(2, 1, 1);
@@ -115,10 +116,10 @@ namespace LeaderboardService.Tests
         }
 
         [Fact]
-        public void GetCustomerWithNeighbors_NonExistentCustomer_ReturnsEmptyList()
+        public async Task GetCustomerWithNeighbors_NonExistentCustomer_ReturnsEmptyList()
         {
             // Arrange
-            _leaderboardManager.UpdateScore(1, 100);
+            await _leaderboardManager.UpdateScore(1, 100);
 
             // Act
             var result = _controller.GetCustomerWithNeighbors(999);
@@ -134,12 +135,12 @@ namespace LeaderboardService.Tests
         [InlineData(1, 0)]
         [InlineData(0, 1)]
         [InlineData(2, 2)]
-        public void GetCustomerWithNeighbors_DifferentRanges_ReturnsCorrectCount(int high, int low)
+        public async Task GetCustomerWithNeighbors_DifferentRanges_ReturnsCorrectCount(int high, int low)
         {
             // Arrange
             for (int i = 1; i <= 5; i++)
             {
-                _leaderboardManager.UpdateScore(i, i * 100);
+                await _leaderboardManager.UpdateScore(i, i * 100);
             }
 
             // Act
@@ -153,12 +154,12 @@ namespace LeaderboardService.Tests
         }
 
         [Fact]
-        public void GetCustomerWithNeighbors_HighLowExceedsBounds_ReturnsAllAvailable()
+        public async Task GetCustomerWithNeighbors_HighLowExceedsBounds_ReturnsAllAvailable()
         {
             // Arrange
-            _leaderboardManager.UpdateScore(1, 100);
-            _leaderboardManager.UpdateScore(2, 200);
-            _leaderboardManager.UpdateScore(3, 300);
+            await _leaderboardManager.UpdateScore(1, 100);
+            await _leaderboardManager.UpdateScore(2, 200);
+            await _leaderboardManager.UpdateScore(3, 300);
 
             // Act
             var result = _controller.GetCustomerWithNeighbors(2, 10, 10);

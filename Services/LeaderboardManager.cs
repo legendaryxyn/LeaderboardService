@@ -26,7 +26,7 @@ namespace LeaderboardService.Services
         /// <param name="scoreChange">The amount to change the score by (between -1000 and 1000).</param>
         /// <returns>The customer's new total score after the update.</returns>
         /// <exception cref="ArgumentException">Thrown when score change is outside the valid range of -1000 to 1000.</exception>
-        public decimal UpdateScore(long customerId, decimal scoreChange)
+        public async Task<decimal> UpdateScore(long customerId, decimal scoreChange)
         {
             if (scoreChange < -1000 || scoreChange > 1000)
             {
@@ -37,7 +37,7 @@ namespace LeaderboardService.Services
             customer.Score += scoreChange;
 
             UpdateRanks();
-            return customer.Score;
+            return await Task.FromResult(customer.Score);
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace LeaderboardService.Services
         /// <param name="start">Optional starting rank to filter from (inclusive).</param>
         /// <param name="end">Optional ending rank to filter to (inclusive).</param>
         /// <returns>An ordered collection of customers by rank, optionally filtered by rank range.</returns>
-        public IEnumerable<Customer> GetCustomersByRank(int? start = null, int? end = null)
+        public async Task<IEnumerable<Customer>> GetCustomersByRank(int? start = null, int? end = null)
         {
             var sortedCustomers = _customers.Values
                 .Where(c => c.Score > 0)
@@ -68,7 +68,7 @@ namespace LeaderboardService.Services
                     .ToList();
             }
 
-            return sortedCustomers;
+            return await Task.FromResult(sortedCustomers);
         }
 
         /// <summary>
@@ -103,10 +103,10 @@ namespace LeaderboardService.Services
         /// - The target customer
         /// - Up to 'low' number of customers with ranks lower than the target customer
         /// </remarks>
-        public IEnumerable<Customer> GetCustomerWithNeighbors(long customerId, int high = 0, int low = 0)
+        public async Task<IEnumerable<Customer>> GetCustomerWithNeighbors(long customerId, int high = 0, int low = 0)
         {
             // Get all customers with their current ranks
-            var allCustomers = GetCustomersByRank().ToList();
+            var allCustomers = (await GetCustomersByRank()).ToList();
             
             // Find the target customer
             var targetCustomer = allCustomers.FirstOrDefault(c => c.CustomerId == customerId);
