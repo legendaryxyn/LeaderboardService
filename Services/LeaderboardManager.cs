@@ -36,9 +36,10 @@ namespace LeaderboardService.Services
             var customer = _customers.GetOrAdd(customerId, new Customer { CustomerId = customerId });
             customer.Score += scoreChange;
 
-            UpdateRanks();
+            // 不再每次更新都排序
             return await Task.FromResult(customer.Score);
         }
+
 
         /// <summary>
         /// Retrieves a list of customers sorted by their rank within an optional range.
@@ -71,24 +72,25 @@ namespace LeaderboardService.Services
             return await Task.FromResult(sortedCustomers);
         }
 
+
         /// <summary>
         /// Updates the ranks of all customers based on their current scores.
         /// Customers are ranked in descending order by score, with customer ID as a tiebreaker.
         /// Only customers with positive scores are ranked.
         /// </summary>
-        private void UpdateRanks()
-        {
-            var sortedCustomers = _customers.Values
-                .Where(c => c.Score > 0)
-                .OrderByDescending(c => c.Score)
-                .ThenBy(c => c.CustomerId);
+        //private void UpdateRanks()
+        //{
+        //    var sortedCustomers = _customers.Values
+        //        .Where(c => c.Score > 0)
+        //        .OrderByDescending(c => c.Score)
+        //        .ThenBy(c => c.CustomerId);
 
-            int rank = 1;
-            foreach (var customer in sortedCustomers)
-            {
-                customer.Rank = rank++;
-            }
-        }
+        //    int rank = 1;
+        //    foreach (var customer in sortedCustomers)
+        //    {
+        //        customer.Rank = rank++;
+        //    }
+        //}
 
         /// <summary>
         /// Gets a specific customer and their neighboring customers based on rank.
