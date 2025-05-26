@@ -33,11 +33,13 @@ namespace LeaderboardService.Services
                 throw new ArgumentException("Score change must be between -1000 and 1000");
             }
 
-            var customer = _customers.GetOrAdd(customerId, new Customer { CustomerId = customerId });
-            customer.Score += scoreChange;
-
-            // 不再每次更新都排序
-            return await Task.FromResult(customer.Score);
+            var t = await Task.Run(() =>
+             {
+                 var customer = _customers.GetOrAdd(customerId, new Customer { CustomerId = customerId });
+                 customer.Score += scoreChange;
+                 return Task.FromResult(customer.Score);
+             });
+            return t;
         }
 
 
